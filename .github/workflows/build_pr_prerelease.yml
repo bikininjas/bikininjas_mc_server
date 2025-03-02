@@ -129,3 +129,8 @@ jobs:
             **Let’s craft, explore, and build together!** 🏰
           branch: ${{ github.ref }}
           base: master
+          labels: |
+            🏰 new-release
+            💎 diamond-tier
+            🧪 needs-testing
+            🔥 hot-stuff
