@@ -43,5 +43,18 @@ EXPOSE 25565
 # Accept EULA
 RUN echo "eula=true" > /app/eula.txt
 
-# Start the NeoForge server with optimized Java 21 flags
-CMD ["java", "-Xmx4G", "-Xms4G", "-XX:+UseG1GC", "-XX:+ParallelRefProcEnabled", "-XX:MaxGCPauseMillis=200", "-XX:+UnlockExperimentalVMOptions", "-XX:+DisableExplicitGC", "-XX:+AlwaysPreTouch", "-XX:G1NewSizePercent=30", "-XX:G1MaxNewSizePercent=40", "-XX:G1HeapRegionSize=8M", "-XX:G1ReservePercent=20", "-XX:G1HeapWastePercent=5", "-XX:G1MixedGCCountTarget=4", "-XX:InitiatingHeapOccupancyPercent=15", "-XX:G1MixedGCLiveThresholdPercent=90", "-XX:G1RSetUpdatingPauseTimePercent=5", "-XX:SurvivorRatio=32", "-XX:+PerfDisableSharedMem", "-XX:MaxTenuringThreshold=1", "-Dusing.aikars.flags=https://mcflags.emc.gs", "-Daikars.new.flags=true", "-jar", "run.jar", "nogui"]
+# Make run.sh executable
+RUN chmod +x /app/run.sh
+
+# Configure optimized JVM arguments in user_jvm_args.txt
+RUN echo "-Xmx4G -Xms4G" > /app/user_jvm_args.txt && \
+    echo "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200" >> /app/user_jvm_args.txt && \
+    echo "-XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch" >> /app/user_jvm_args.txt && \
+    echo "-XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M" >> /app/user_jvm_args.txt && \
+    echo "-XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4" >> /app/user_jvm_args.txt && \
+    echo "-XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90" >> /app/user_jvm_args.txt && \
+    echo "-XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem" >> /app/user_jvm_args.txt && \
+    echo "-XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true" >> /app/user_jvm_args.txt
+
+# Use the run.sh script to start the server
+CMD ["/app/run.sh", "nogui"]
