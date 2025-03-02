@@ -6,7 +6,9 @@ set -e  # Exit on any error
 
 echo "=== Testing Docker Image Build ==="
 echo "Building Docker image..."
-docker build -t bikininjas/minecraft-server:test ../../
+REPO_ROOT="$(cd "$(dirname "$0")/../../" && pwd)"
+echo "Using Dockerfile from: $REPO_ROOT"
+docker build -t bikininjas/minecraft-server:test "$REPO_ROOT"
 
 echo "Verifying Docker image..."
 # Check if the image exists
