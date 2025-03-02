@@ -8,31 +8,35 @@ RUN apt-get update && \
     apt-get install -y curl unzip && \
     rm -rf /var/lib/apt/lists/*
 
-# Create directories for mods and plugins
-RUN mkdir -p /app/mods /app/plugins
+# Create directory for plugins
+RUN mkdir -p /app/plugins
 
-# Download NeoForge and server files (using version 21.1.125 or newer for Create mod compatibility)
-RUN curl -o neoforge-installer.jar https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.127/neoforge-21.1.127-installer.jar && \
-    java -jar neoforge-installer.jar --installServer && \
-    rm neoforge-installer.jar
+# Define Paper version
+ENV PAPER_VERSION=1.21.1
+ENV PAPER_BUILD=99
 
-# Download top 10 NeoForge plugins
-RUN curl -L -o /app/plugins/LuckPerms.jar https://cdn.modrinth.com/data/Vebnzrzj/versions/5.4.113/LuckPerms-Bukkit-5.4.113.jar && \
-    curl -L -o /app/plugins/SimpleVoiceChat.jar https://cdn.modrinth.com/data/9eGKb6K1/versions/bukkit-2.5.9/voicechat-bukkit-2.5.9.jar && \
-    curl -L -o /app/plugins/WorldEdit.jar https://cdn.modrinth.com/data/kkjrWcj9/versions/7.2.18+6575-2d8be55/worldedit-bukkit-7.2.18.jar && \
-    curl -L -o /app/plugins/Chunky.jar https://cdn.modrinth.com/data/fALzjamp/versions/1.3.92/Chunky-1.3.92.jar && \
-    curl -L -o /app/plugins/PlasmoVoice.jar https://cdn.modrinth.com/data/1bZhdhsH/versions/2.0.6/plasmovoice-bukkit-2.0.6.jar && \
-    curl -L -o /app/plugins/ViaVersion.jar https://cdn.modrinth.com/data/YlVPIjsY/versions/4.9.2/ViaVersion-4.9.2.jar && \
-    curl -L -o /app/plugins/Dynmap.jar https://cdn.modrinth.com/data/fRQREgAc/versions/3.7-beta-2/Dynmap-3.7-beta-2-spigot.jar && \
-    curl -L -o /app/plugins/TAB.jar https://cdn.modrinth.com/data/Gd7Uq1Dn/versions/4.0.2/TAB-4.0.2.jar && \
-    curl -L -o /app/plugins/DiscordSRV.jar https://cdn.modrinth.com/data/QO01UOV5/versions/1.27.0/DiscordSRV-Build-1.27.0.jar && \
-    curl -L -o /app/plugins/CoreProtect.jar https://cdn.modrinth.com/data/Lu3KuzdV/versions/21.3/CoreProtect-21.3.jar
+# Download Paper server
+RUN curl -o /app/paper.jar https://api.papermc.io/v2/projects/paper/versions/${PAPER_VERSION}/builds/${PAPER_BUILD}/downloads/paper-${PAPER_VERSION}-${PAPER_BUILD}.jar
 
-# Download Create mod (latest version compatible with Java 21)
-RUN curl -L -o /app/mods/create-mod.jar https://cdn.modrinth.com/data/LNytGWDc/versions/NEb0yK69/create-1.21.1-6.0.0.jar
+# Download plugins compatible with 1.21.1
+RUN curl -L -o /app/plugins/LuckPerms.jar https://download.luckperms.net/1573/bukkit/loader/LuckPerms-Bukkit-5.4.156.jar && \
+    curl -L -o /app/plugins/WorldEdit.jar https://cdn.modrinth.com/data/1u6JkXh5/versions/Bu1zaaoc/worldedit-bukkit-7.3.9.jar && \
+    curl -L -o /app/plugins/Chunky.jar https://cdn.modrinth.com/data/fALzjamp/versions/ytBhnGfO/Chunky-Bukkit-1.4.28.jar && \
+    curl -L -o /app/plugins/ViaVersion.jar https://cdn.modrinth.com/data/P1OZGk5p/versions/Wry9t810/ViaVersion-5.2.2-SNAPSHOT.jar && \
+    curl -L -o /app/plugins/Dynmap.jar https://cdn.modrinth.com/data/fRQREgAc/versions/1pMUPhY2/Dynmap-3.7-beta-8-fabric-1.21.jar && \
+    curl -L -o /app/plugins/TAB.jar https://github.com/NEZNAMY/TAB/releases/download/5.0.7/TAB.v5.0.7.jar && \
+    curl -L -o /app/plugins/DiscordSRV.jar https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.27.0/DiscordSRV-Build-1.27.0.jar && \
+    curl -L -o /app/plugins/CoreProtect.jar https://cdn.modrinth.com/data/Lu3KuzdV/versions/mvLpRWww/CoreProtect-21.3.jar && \
+    curl -L -o /app/plugins/EssentialsX.jar https://github.com/EssentialsX/Essentials/releases/download/2.20.1/EssentialsX-2.20.1.jar && \
+    curl -L -o /app/plugins/Multiverse-Core.jar https://media.forgecdn.net/files/4580/385/Multiverse-Core-4.3.11.jar && \
+    curl -L -o /app/plugins/UltraPermissions.jar https://www.spigotmc.org/resources/ultra-permissions.42678/download?version=569283
 
 # Create server configuration files
 COPY server.properties /app/server.properties
+COPY paper.yml /app/paper.yml
+COPY spigot.yml /app/spigot.yml
+COPY bukkit.yml /app/bukkit.yml
+COPY commands.yml /app/commands.yml
 COPY luckperms.yml /app/plugins/luckperms/luckperms.yml
 COPY ops.json /app/ops.json
 COPY whitelist.json /app/whitelist.json
@@ -43,18 +47,8 @@ EXPOSE 25565
 # Accept EULA
 RUN echo "eula=true" > /app/eula.txt
 
-# Make run.sh executable
-RUN chmod +x /app/run.sh
+# Configure optimized JVM arguments (Aikar's flags)
+ENV JAVA_OPTS="-Xms4G -Xmx4G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true"
 
-# Configure optimized JVM arguments in user_jvm_args.txt
-RUN echo "-Xmx4G -Xms4G" > /app/user_jvm_args.txt && \
-    echo "-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200" >> /app/user_jvm_args.txt && \
-    echo "-XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch" >> /app/user_jvm_args.txt && \
-    echo "-XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1HeapRegionSize=8M" >> /app/user_jvm_args.txt && \
-    echo "-XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4" >> /app/user_jvm_args.txt && \
-    echo "-XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90" >> /app/user_jvm_args.txt && \
-    echo "-XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem" >> /app/user_jvm_args.txt && \
-    echo "-XX:MaxTenuringThreshold=1 -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true" >> /app/user_jvm_args.txt
-
-# Use the run.sh script to start the server
-CMD ["/app/run.sh", "nogui"]
+# Start the Paper server
+CMD ["sh", "-c", "java $JAVA_OPTS -jar /app/paper.jar nogui"]
