@@ -1,18 +1,24 @@
-# my_mc_server
+# Welcome to the Blocky World of my_mc_server! 🎮✨
 
-## What is it ?
+## What is it?
 
-A docker image to be built with GitHub actions for Docker Hub and GH Releases to build a Docker image pushed to Docker Hub to run Minecraft Paper Server
-
-![CI](https://github.com/SebPikPik/my_mc_server/actions/workflows/build_release.yml/badge.svg)
-![CD](https://github.com/SebPikPik/my_mc_server/actions/workflows/deploy.yml/badge.svg)
+This is a magical Docker image for running your very own Minecraft server with Java 21! 🏰✨ Dive into the world of creativity with the top Neoforge plugins and the amazing Create mod!
 
 ## Server Download
 
-https://papermc.io/
-https://github.com/PaperMC
+Ready to embark on your adventure? Download your server from [PaperMC](https://papermc.io/) and start crafting your dream world!
 
+## Neoforge Plugins
 
-## Server Plugins 
+This server is packed with awesome Neoforge plugins to enhance your gameplay:
+- **LuckPerms**: A powerful permissions management plugin that lets you control the realm! 🛡️
+- **EssentialsX**: Your trusty toolkit for essential commands and features to keep your server running smoothly! ⚙️
+- **Vault**: The ultimate permissions, economy, and chat API that integrates with many other plugins! 💰
+- **Create**: Unleash your creativity with this mod that allows for complex contraptions and automation! ⚙️
+- **(Additional plugins to be listed)**
 
-[HANGAR](https://hangar.papermc.io/?page=0&version=1.20.4&version=1.20.3&version=1.20.2&version=1.20.1&version=1.20&platform=PAPER&sort=-stars)
+## LuckPerms Configuration
+
+In this magical realm, the player "redPikPik" is the supreme admin, wielding the power to manage all plugins! 🌟
+
+Get ready to craft, explore, and build your own Minecraft adventure! If you have any questions or need help, just shout! 📣
