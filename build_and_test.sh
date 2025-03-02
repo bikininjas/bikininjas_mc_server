@@ -7,9 +7,19 @@ if docker ps -a | grep -q mc-server-test; then
     docker rm -f mc-server-test
 fi
 
+# Make sure jars directory exists
+if [ ! -d "./jars" ]; then
+    echo "Error: jars directory not found!"
+    exit 1
+fi
+
+# List jars to verify they're available
+echo "Available jar files:"
+ls -la ./jars/
+
 # Build the Docker image
 echo "Building Docker image for Paper 1.21.1..."
-docker build -t bikininjas/minecraft-server:paper-1.21.1-test .
+docker build --no-cache -t bikininjas/minecraft-server:paper-1.21.1-test .
 
 # Check if build was successful
 if [ $? -eq 0 ]; then

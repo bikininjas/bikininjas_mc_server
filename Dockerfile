@@ -30,12 +30,12 @@ RUN curl -L -o /app/plugins/WorldEdit.jar https://cdn.modrinth.com/data/1u6JkXh5
     curl -L -o /app/plugins/VaultUnlocked.jar https://cdn.modrinth.com/data/ayRaM8J7/versions/fC53e1Vr/VaultUnlocked-2.9.0.jar && \
     curl -L -o /app/plugins/Multiverse-Core.jar https://cdn.modrinth.com/data/3wmN97b8/versions/jbQopAkk/multiverse-core-4.3.14.jar
 
-# Copy custom jar files from local directory
-COPY jars/UltraPermissions-5.6.4.jar /app/plugins/UltraPermissions.jar
-COPY jars/UltraEconomy-2.10.3.jar /app/plugins/UltraEconomy.jar
-COPY jars/ItemsAdder_4.0.8.jar /app/plugins/ItemsAdder.jar
-COPY jars/Reforges-v6.73.0.jar /app/plugins/Reforges.jar
-COPY jars/mcMMO.jar /app/plugins/mcMMO.jar
+# Download UltraPermissions and other custom plugins
+RUN curl -L -o /app/plugins/UltraPermissions.jar https://www.spigotmc.org/resources/ultra-permissions.42678/download?version=569283 && \
+    curl -L -o /app/plugins/UltraEconomy.jar https://www.spigotmc.org/resources/ultra-economy.83374/download?version=569281 && \
+    curl -L -o /app/plugins/ItemsAdder.jar https://www.spigotmc.org/resources/itemsadder.73355/download?version=572321 && \
+    curl -L -o /app/plugins/Reforges.jar https://www.spigotmc.org/resources/reforges-custom-enchantments-1-16-1-21.113599/download?version=572322 && \
+    curl -L -o /app/plugins/mcMMO.jar https://www.spigotmc.org/resources/official-mcmmo-original-author-returns.64348/download?version=572323
 
 # Create server configuration files
 COPY server.properties /app/server.properties
