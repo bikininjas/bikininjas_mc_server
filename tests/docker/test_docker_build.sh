@@ -24,8 +24,16 @@ echo "Checking for required files in the image..."
 CONTAINER_ID=$(docker create bikininjas/minecraft-server:test)
 
 # Check for server files
-docker cp $CONTAINER_ID:/app/run.jar /tmp/run.jar 2>/dev/null || { echo "❌ ERROR: Server JAR not found"; docker rm $CONTAINER_ID; exit 1; }
-echo "✅ Server JAR found"
+docker cp $CONTAINER_ID:/app/run.sh /tmp/run.sh 2>/dev/null || { echo "❌ ERROR: Server run script not found"; docker rm $CONTAINER_ID; exit 1; }
+echo "✅ Server run script found"
+
+# Check for NeoForge JAR
+docker cp $CONTAINER_ID:/app/libraries/net/neoforged/neoforge/21.1.122/neoforge-21.1.122-server.jar /tmp/neoforge-server.jar 2>/dev/null || { echo "❌ ERROR: NeoForge server JAR not found"; docker rm $CONTAINER_ID; exit 1; }
+echo "✅ NeoForge server JAR found"
+
+# Check for Minecraft server JAR
+docker cp $CONTAINER_ID:/app/libraries/net/minecraft/server/1.21.1/server-1.21.1.jar /tmp/minecraft-server.jar 2>/dev/null || { echo "❌ ERROR: Minecraft server JAR not found"; docker rm $CONTAINER_ID; exit 1; }
+echo "✅ Minecraft server JAR found"
 
 # Check for plugins
 PLUGINS=("LuckPerms.jar" "SimpleVoiceChat.jar" "WorldEdit.jar" "Chunky.jar" "PlasmoVoice.jar" 
@@ -49,6 +57,6 @@ done
 
 # Clean up
 docker rm $CONTAINER_ID
-rm -f /tmp/run.jar /tmp/*.jar /tmp/server.properties /tmp/ops.json /tmp/whitelist.json /tmp/eula.txt
+rm -f /tmp/run.sh /tmp/*.jar /tmp/server.properties /tmp/ops.json /tmp/whitelist.json /tmp/eula.txt
 
 echo "=== All Docker image tests passed! ==="
