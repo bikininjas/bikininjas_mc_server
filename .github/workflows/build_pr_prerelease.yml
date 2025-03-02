@@ -6,6 +6,9 @@ on:
       - synchronize
       - reopened
   workflow_dispatch:
+  push:
+    branches-ignore:
+      - 'master'
 
 jobs:
   build-and-test-pr:
