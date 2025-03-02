@@ -61,7 +61,7 @@ jobs:
   # This job runs on master branch pushes to build and test the Docker image
   build-and-test-master:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.7
@@ -110,7 +110,7 @@ jobs:
           prerelease: true
           
       - name: Create Pull Request if not exists
-        if: github.event_name == 'push' && github.ref != 'refs/heads/master'
+        if: github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/master')
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
