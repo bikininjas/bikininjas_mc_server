@@ -66,14 +66,5 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         repository: ${{ vars.DOCKERHUB_USERNAME }}/paper-server
         short-description: ${{ github.event.repository.description }}
-  # reporting:
-  #   needs: build-push
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Actions for Discord
-  #     env:
-  #       DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-  #     uses: Ilshidur/action-discord@0.3.2
-  #     with:
-  #       args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has been built and pushed.'
+
     
