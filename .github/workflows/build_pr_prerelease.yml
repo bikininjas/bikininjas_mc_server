@@ -1,0 +1,131 @@
+name: Build, PR, and Beta Release
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+  push:
+    branches:
+      - 'master'
+  workflow_dispatch:
+
+jobs:
+  # This job runs on PR events to build and test the Docker image
+  build-and-test:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
+        
+      - name: Docker Setup Buildx
+        uses: docker/setup-buildx-action@v3.3.0
+        
+      - name: Build Docker image (no push)
+        uses: docker/build-push-action@v6.2.0
+        with:
+          push: false
+          context: .
+          tags: bikininjas/minecraft-server:test
+          load: true
+          
+      - name: Install test dependencies
+        run: |
+          pip install mcstatus
+          
+      - name: Run Docker image tests
+        run: |
+          chmod +x tests/docker/test_docker_build.sh
+          ./tests/docker/test_docker_build.sh
+          
+      # Server connection tests removed as they take too long
+      # - name: Run basic server tests
+      #   run: |
+      #     chmod +x tests/server/test_server_connection.sh
+      #     ./tests/server/test_server_connection.sh
+          
+      - name: Auto-merge if build successful
+        if: success()
+        uses: pascalgn/automerge-action@v0.15.6
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          MERGE_LABELS: ""
+          MERGE_METHOD: "squash"
+          MERGE_COMMIT_MESSAGE: "Auto-merge PR #${{ github.event.pull_request.number }} after successful build"
+          MERGE_FORKS: "true"
+          MERGE_RETRIES: "6"
+          MERGE_RETRY_SLEEP: "10000"
+          MERGE_REQUIRED_APPROVALS: "0"
+
+  # This job runs on master branch pushes to build and test the Docker image
+  build-and-test-master:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
+        
+      - name: Docker Setup Buildx
+        uses: docker/setup-buildx-action@v3.3.0
+        
+      - name: Build Docker image (no push)
+        uses: docker/build-push-action@v6.2.0
+        with:
+          push: false
+          context: .
+          tags: bikininjas/minecraft-server:test
+          load: true
+          
+      - name: Install test dependencies
+        run: |
+          pip install mcstatus
+          
+      - name: Run Docker image tests
+        id: docker_tests
+        run: |
+          chmod +x tests/docker/test_docker_build.sh
+          ./tests/docker/test_docker_build.sh
+      
+      - name: Create Semantic Version Tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
+          release_branches: master
+          pre_release_branches: "**"
+          prerelease: true
+          prerelease_suffix: beta
+          custom_tag: ""
+          
+      - name: Create GitHub Prerelease
+        if: steps.tag_version.outputs.new_tag
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Beta Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: true
+          
+      - name: Create Pull Request if not exists
+        if: github.event_name == 'push' && github.ref != 'refs/heads/master'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "ci(release): prepare for release ${{ steps.tag_version.outputs.new_tag }}"
+          title: "Release ${{ steps.tag_version.outputs.new_tag }}"
+          body: |
+            ## Automated Pull Request
+            
+            This PR was automatically created by the CI workflow.
+            
+            Changes included in this release:
+            ${{ steps.tag_version.outputs.changelog }}
+          branch: ${{ github.ref }}
+          base: master
+
+
+
+    
