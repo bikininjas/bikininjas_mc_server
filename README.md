@@ -2,7 +2,7 @@
 
 ## What is it?
 
-This is a magical Docker image for running your very own Minecraft server with Java 21! 🏰✨ Dive into the world of creativity with the top NeoForge plugins and the amazing Create mod!
+This is a magical Docker image for running your very own Minecraft server with Java 21! 🏰✨ Dive into the world of creativity with the top Paper plugins optimized for Minecraft 1.21.1!
 
 ## Tips for Adventurers!
 - **Gather Resources**: Always start by gathering wood and stone to build your first shelter! 🪨
@@ -20,44 +20,42 @@ For more details, see [Release Process](docs/RELEASE_PROCESS.md).
 
 ## Server Information
 
-This server runs on NeoForge 21.1.122 with Java 21, providing a stable and feature-rich environment for your Minecraft adventures!
+This server runs on Paper 1.21.1 with Java 21, providing a stable and feature-rich environment for your Minecraft adventures!
 
-## Top 10 NeoForge Plugins
+## Top 10 Paper Plugins
 
-This server comes pre-loaded with the top 10 NeoForge plugins to enhance your gameplay:
+This server comes pre-loaded with the top 10 Paper plugins to enhance your gameplay:
 
-1. **LuckPerms** ([Download](https://modrinth.com/plugin/luckperms)): A powerful permissions management plugin that lets you control the realm! 🛡️
+1. **LuckPerms** ([Download](https://luckperms.net/)): A powerful permissions management plugin that lets you control the realm! 🛡️
 
-2. **Simple Voice Chat** ([Download](https://modrinth.com/plugin/simple-voice-chat)): Talk to other players in-game with proximity-based voice chat! 🎙️
+2. **WorldEdit** ([Download](https://dev.bukkit.org/projects/worldedit)): A powerful in-game map editor for building amazing structures quickly! 🏗️
 
-3. **WorldEdit** ([Download](https://modrinth.com/plugin/worldedit)): A powerful in-game map editor for building amazing structures quickly! 🏗️
+3. **Chunky** ([Download](https://modrinth.com/plugin/chunky)): Pre-generates chunks quickly and efficiently to reduce server lag! ⚡
 
-4. **Chunky** ([Download](https://modrinth.com/plugin/chunky)): Pre-generates chunks quickly and efficiently to reduce server lag! ⚡
+4. **ViaVersion** ([Download](https://modrinth.com/plugin/viaversion)): Allows newer clients to connect to older servers, improving compatibility! 🔄
 
-5. **Plasmo Voice** ([Download](https://modrinth.com/plugin/plasmo-voice)): Another excellent proximity voice chat option with audio positioning! 🔊
+5. **Dynmap** ([Download](https://dynmap.us/)): Creates a Google Maps-like map of your Minecraft world viewable in a browser! 🗺️
 
-6. **ViaVersion** ([Download](https://modrinth.com/plugin/viaversion)): Allows newer clients to connect to older servers, improving compatibility! 🔄
+6. **TAB** ([Download](https://github.com/NEZNAMY/TAB)): Customizes the player list and nameplates with advanced features! 📋
 
-7. **Dynmap** ([Download](https://modrinth.com/plugin/dynmap)): Creates a Google Maps-like map of your Minecraft world viewable in a browser! 🗺️
+7. **DiscordSRV** ([Download](https://github.com/DiscordSRV/DiscordSRV)): Bridges your Minecraft server chat with Discord for seamless communication! 💬
 
-8. **TAB** ([Download](https://modrinth.com/plugin/tab-was-taken)): Customizes the player list and nameplates with advanced features! 📋
+8. **CoreProtect** ([Download](https://modrinth.com/plugin/coreprotect)): Tracks block changes, item transactions, and more for easy rollbacks and inspections! 🔍
 
-9. **DiscordSRV** ([Download](https://modrinth.com/plugin/discordsrv)): Bridges your Minecraft server chat with Discord for seamless communication! 💬
+9. **EssentialsX** ([Download](https://essentialsx.net/)): The essential plugin suite for Bukkit servers with hundreds of useful commands and features! 🧰
 
-10. **CoreProtect** ([Download](https://modrinth.com/plugin/coreprotect)): Tracks block changes, item transactions, and more for easy rollbacks and inspections! 🔍
+10. **Multiverse-Core** ([Download](https://dev.bukkit.org/projects/multiverse-core)): Create and manage multiple worlds with different settings and gamemodes! 🌎
 
-## Create Mod
+## Paper Performance
 
-The server includes the latest **Create Mod v6.0.0** ([Download](https://modrinth.com/mod/create/version/1.21.1-6.0.0)) compatible with Java 21 and Minecraft 1.21.1!
+This server uses Paper, a high-performance fork of Spigot that significantly improves server performance while maintaining plugin compatibility. Benefits include:
 
-New features in Create 6.0.0 include:
-- Chain conveyor and Item hatch
-- Packager and Re-packager with Cardboard packages
-- Stock link and Stock ticker
-- Factory gauge and Pulse timer
-- Cardboard armor set and sword
-- Cherry, bamboo, and industrial iron windows
-- And much more!
+- Dramatically improved TPS (ticks per second)
+- Better chunk loading and entity handling
+- Reduced memory usage and CPU load
+- Extensive configuration options for optimization
+- Regular updates and security patches
+- Full compatibility with Bukkit/Spigot plugins
 
 ## LuckPerms Configuration
 
@@ -67,7 +65,7 @@ In this magical realm, the player "redPikPik" is the supreme admin, wielding the
 
 1. Pull the Docker image
 2. Run the container with port 25565 exposed
-3. Connect to your server using Minecraft Java Edition 1.21.1
+3. Connect to your server using Minecraft Java Edition 1.21.4
 4. Enjoy your adventure!
 
 ## Server Configuration

@@ -1,0 +1,146 @@
+# This is the main configuration file for Paper.
+# As you can see, there's a lot to configure. Some options may impact gameplay, so use
+# with caution, and make sure you know what each option does before configuring.
+#
+# If you need help with the configuration or have any questions related to Paper,
+# join us in our Discord or check the docs page.
+#
+# Discord: https://discord.gg/papermc
+# Documentation: https://docs.papermc.io/
+
+_version: 29
+messages:
+  no-permission: '&cI''m sorry, but you do not have permission to perform this command.
+    Please contact the server administrators if you believe that this is in error.'
+  kick:
+    authentication-servers-down: ''
+    connection-throttle: Connection throttled! Please wait before reconnecting.
+    flying-player: Flying is not enabled on this server
+    flying-vehicle: Flying is not enabled on this server
+timings:
+  enabled: true
+  verbose: true
+  url: https://timings.aikar.co/
+  server-name-privacy: false
+  hidden-config-entries:
+  - database
+  - settings.bungeecord-addresses
+  - settings.velocity-support.secret
+  history-interval: 300
+  history-length: 3600
+  server-name: Bikininjas Paper Server
+world-settings:
+  default:
+    prevent-moving-into-unloaded-chunks: true
+    max-auto-save-chunks-per-tick: 24
+    optimize-explosions: true
+    mob-spawner-tick-rate: 2
+    game-mechanics:
+      disable-chest-cat-detection: true
+      disable-player-crits: false
+      disable-sprint-interruption-on-attack: false
+      disable-end-credits: false
+      shield-blocking-delay: 5
+      disable-unloaded-chunk-enderpearl: true
+      scan-for-legacy-ender-dragon: true
+      fix-curing-zombie-villager-discount-exploit: true
+      disable-pillager-patrols: false
+      pillager-patrols:
+        spawn-chance: 0.2
+        spawn-delay:
+          per-player: false
+          ticks: 12000
+        start:
+          per-player: false
+          day: 5
+    spawn-limits:
+      monster: 70
+      creature: 10
+      ambient: 15
+      axolotls: 5
+      underground_water_creature: 5
+      water_creature: 5
+      water_ambient: 20
+    tick-rates:
+      sensor:
+        villager:
+          secondarypoisensor: 40
+      behavior:
+        villager:
+          validatenearbypoi: 60
+    hopper:
+      cooldown-when-full: true
+      disable-move-event: false
+      ignore-occluding-blocks: true
+    entities-target-with-follow-range: false
+    unsupported-settings:
+      fix-invulnerable-end-crystal-exploit: true
+    despawn-ranges:
+      monster:
+        soft: 32
+        hard: 128
+      creature:
+        soft: 32
+        hard: 128
+      ambient:
+        soft: 32
+        hard: 128
+      axolotls:
+        soft: 32
+        hard: 128
+      underground_water_creature:
+        soft: 32
+        hard: 128
+      water_creature:
+        soft: 32
+        hard: 128
+      water_ambient:
+        soft: 32
+        hard: 64
+      misc:
+        soft: 32
+        hard: 128
+    entity-per-chunk-save-limit:
+      experience_orb: 16
+      snowball: 16
+      ender_pearl: 16
+      arrow: 16
+      fireball: 16
+      small_fireball: 16
+    anti-xray:
+      enabled: true
+      engine-mode: 1
+      max-block-height: 64
+      update-radius: 2
+      lava-obscures: false
+      use-permission: false
+      hidden-blocks:
+      - copper_ore
+      - deepslate_copper_ore
+      - gold_ore
+      - deepslate_gold_ore
+      - iron_ore
+      - deepslate_iron_ore
+      - coal_ore
+      - deepslate_coal_ore
+      - lapis_ore
+      - deepslate_lapis_ore
+      - mossy_cobblestone
+      - obsidian
+      - chest
+      - diamond_ore
+      - deepslate_diamond_ore
+      - redstone_ore
+      - deepslate_redstone_ore
+      - clay
+      - emerald_ore
+      - deepslate_emerald_ore
+      - ender_chest
+      replacement-blocks:
+      - stone
+      - deepslate
+      - netherrack
+      - blackstone
+      - basalt
+    viewdistances:
+      no-tick-view-distance: 12
