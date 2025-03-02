@@ -79,6 +79,54 @@ jobs:
             echo "release_exists=false" >> $GITHUB_OUTPUT
           fi
       
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          # Get the previous tag
+          PREV_TAG=$(git tag --sort=-v:refname | head -n 2 | tail -n 1 || echo "")
+          
+          if [ -z "$PREV_TAG" ]; then
+            # If there's no previous tag, get all commits
+            COMMITS=$(git log --pretty=format:"%s" | head -n 10)
+          else
+            # Get commits between tags
+            COMMITS=$(git log --pretty=format:"%s" $PREV_TAG..HEAD | head -n 10)
+          fi
+          
+          # Convert commits to Minecraft-themed changelog
+          CHANGELOG=""
+          while IFS= read -r commit; do
+            if [[ $commit == feat* ]]; then
+              CHANGELOG+="- 💎 **New Diamond Ore Found!** ${commit#feat*: }\n"
+            elif [[ $commit == fix* ]]; then
+              CHANGELOG+="- 🛠️ **Creeper Explosion Fixed!** ${commit#fix*: }\n"
+            elif [[ $commit == perf* ]]; then
+              CHANGELOG+="- ⚡ **Redstone Circuit Optimized!** ${commit#perf*: }\n"
+            elif [[ $commit == docs* ]]; then
+              CHANGELOG+="- 📚 **Added to the Book of Knowledge!** ${commit#docs*: }\n"
+            elif [[ $commit == style* ]]; then
+              CHANGELOG+="- 🎨 **Texture Pack Updated!** ${commit#style*: }\n"
+            elif [[ $commit == refactor* ]]; then
+              CHANGELOG+="- 🔄 **Village Restructured!** ${commit#refactor*: }\n"
+            elif [[ $commit == test* ]]; then
+              CHANGELOG+="- 🧪 **Potion Testing Complete!** ${commit#test*: }\n"
+            elif [[ $commit == ci* ]]; then
+              CHANGELOG+="- 🔧 **Automated Crafting Table Improved!** ${commit#ci*: }\n"
+            else
+              CHANGELOG+="- 🌟 **Magic Happened!** $commit\n"
+            fi
+          done <<< "$COMMITS"
+          
+          # If no commits found, add a default message
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="- 🌟 **Magic Happened!** The Minecraft world has been improved in mysterious ways!\n"
+          fi
+          
+          # Save changelog to output with proper escaping
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
       - name: Create GitHub Release
         if: steps.get_tag.outputs.final_tag && steps.check_release.outputs.release_exists != 'true'
         uses: ncipollo/release-action@v1
@@ -90,8 +138,8 @@ jobs:
             
             We're excited to announce the release of version ${{ steps.get_tag.outputs.final_tag }}!
             
-            **What's new?**
-            - No changelog available
+            **What's new in this Minecraft update?**
+            ${{ steps.changelog.outputs.changelog }}
             
             **Prepare to dive into the world of creativity and fun!** 🌟
             
