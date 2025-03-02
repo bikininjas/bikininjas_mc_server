@@ -43,6 +43,24 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ steps.get_tag.outputs.final_tag }}
             
+      - name: Create GitHub Release
+        if: steps.get_tag.outputs.final_tag
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.get_tag.outputs.final_tag }}
+          name: Release ${{ steps.get_tag.outputs.final_tag }}
+          body: |
+            **🎉 Hooray! A new adventure awaits! 🎉**
+            
+            We’re excited to announce the release of version ${{ steps.get_tag.outputs.final_tag }}!
+            
+            **What’s new?**
+            - No changelog available
+            
+            **Prepare to dive into the world of creativity and fun!** 🌟
+            
+            Happy crafting! 🏰
+            
       - name: Build and push Docker images
         uses: docker/build-push-action@v6.2.0
         with:

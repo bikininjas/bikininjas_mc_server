@@ -121,11 +121,11 @@ jobs:
             
             This PR was automatically created by the CI workflow.
             
+            **Get ready to embark on a new adventure!** 🌍
+            
             Changes included in this release:
             ${{ steps.tag_version.outputs.changelog }}
+            
+            **Let’s craft, explore, and build together!** 🏰
           branch: ${{ github.ref }}
           base: master
-
-
-
-    
