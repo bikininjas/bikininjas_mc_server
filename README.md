@@ -4,6 +4,11 @@
 
 This is a magical Docker image for running your very own Minecraft server with Java 21! 🏰✨ Dive into the world of creativity with the top NeoForge plugins and the amazing Create mod!
 
+## Tips for Adventurers!
+- **Gather Resources**: Always start by gathering wood and stone to build your first shelter! 🪨
+- **Explore**: Venture into caves for precious ores and discover hidden treasures! 💎
+- **Craft Wisely**: Use your crafting table to create tools and weapons that will aid you in your adventures! ⚔️
+
 ## Development & Release Process
 
 This project follows semantic versioning and uses an automated CI/CD pipeline for releases:
