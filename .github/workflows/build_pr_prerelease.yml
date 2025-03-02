@@ -97,6 +97,7 @@ jobs:
           pre_release_branches: "**"
           prerelease: true
           prerelease_suffix: beta
+          custom_tag: ""
           
       - name: Create GitHub Prerelease
         if: steps.tag_version.outputs.new_tag
