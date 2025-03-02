@@ -89,14 +89,24 @@ jobs:
       - name: Update Pre-release to Full Release
         if: steps.check_release.outputs.release_exists == 'true' && steps.check_release.outputs.is_prerelease == 'true'
         run: |
-          # Update the release to make it a full release
+          # Get the current release name
+          RELEASE_NAME=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.check_release.outputs.release_id }}" \
+            | jq -r '.name')
+          
+          # Replace "Beta Release" with "Release" in the name
+          NEW_NAME=$(echo "$RELEASE_NAME" | sed 's/Beta Release/Release/g')
+          echo "Changing release name from '$RELEASE_NAME' to '$NEW_NAME'"
+          
+          # Update the release to make it a full release with the new name
           curl -X PATCH \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            -d '{"prerelease": false, "make_latest": "true"}' \
+            -d "{\"prerelease\": false, \"make_latest\": \"true\", \"name\": \"$NEW_NAME\"}" \
             "https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.check_release.outputs.release_id }}"
           
-          echo "Updated release ${{ steps.check_release.outputs.release_id }} to a full release"
+          echo "Updated release ${{ steps.check_release.outputs.release_id }} to a full release with name '$NEW_NAME'"
       
       - name: Generate Changelog
         id: changelog
