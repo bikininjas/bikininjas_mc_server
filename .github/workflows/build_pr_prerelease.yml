@@ -11,10 +11,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  # This job runs on PR events to build and test the Docker image
-  build-and-test:
-    runs-on: ubuntu-latest
+  build-and-test-pr:
     if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.7
@@ -35,29 +34,9 @@ jobs:
           chmod +x tests/docker/test_docker_build.sh
           ./tests/docker/test_docker_build.sh
           
-      # Server connection tests removed as they take too long
-      # - name: Run basic server tests
-      #   run: |
-      #     chmod +x tests/server/test_server_connection.sh
-      #     ./tests/server/test_server_connection.sh
-          
-      - name: Auto-merge if build successful
-        if: success()
-        uses: pascalgn/automerge-action@v0.15.6
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          MERGE_LABELS: ""
-          MERGE_METHOD: "squash"
-          MERGE_COMMIT_MESSAGE: "Auto-merge PR #${{ github.event.pull_request.number }} after successful build"
-          MERGE_FORKS: "true"
-          MERGE_RETRIES: "6"
-          MERGE_RETRY_SLEEP: "10000"
-          MERGE_REQUIRED_APPROVALS: "0"
-
-  # This job runs on master branch pushes to build and test the Docker image
   build-and-test-master:
-    runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.7
@@ -78,6 +57,23 @@ jobs:
           chmod +x tests/docker/test_docker_build.sh
           ./tests/docker/test_docker_build.sh
       
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          
+      - name: Run Python tests
+        run: |
+          if [ -f run_tests.sh ]; then
+            chmod +x run_tests.sh
+            ./run_tests.sh
+          fi
+          
       - name: Create Semantic Version Tag
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
@@ -89,13 +85,64 @@ jobs:
           append_to_pre_release_tag: beta
           custom_tag: ""
           
+      - name: Generate Minecraft Changelog
+        id: minecraft_changelog
+        if: steps.tag_version.outputs.new_tag
+        run: |
+          # Get the changelog from tag_version
+          CHANGELOG="${{ steps.tag_version.outputs.changelog }}"
+          
+          # Convert conventional commits to Minecraft-themed changelog
+          MINECRAFT_CHANGELOG=""
+          while IFS= read -r line; do
+            if [[ $line == *"feat"* ]]; then
+              MINECRAFT_CHANGELOG+="- 💎 **New Diamond Ore Found!** ${line#*feat*: }\n"
+            elif [[ $line == *"fix"* ]]; then
+              MINECRAFT_CHANGELOG+="- 🛠️ **Creeper Explosion Fixed!** ${line#*fix*: }\n"
+            elif [[ $line == *"perf"* ]]; then
+              MINECRAFT_CHANGELOG+="- ⚡ **Redstone Circuit Optimized!** ${line#*perf*: }\n"
+            elif [[ $line == *"docs"* ]]; then
+              MINECRAFT_CHANGELOG+="- 📚 **Added to the Book of Knowledge!** ${line#*docs*: }\n"
+            elif [[ $line == *"style"* ]]; then
+              MINECRAFT_CHANGELOG+="- 🎨 **Texture Pack Updated!** ${line#*style*: }\n"
+            elif [[ $line == *"refactor"* ]]; then
+              MINECRAFT_CHANGELOG+="- 🔄 **Village Restructured!** ${line#*refactor*: }\n"
+            elif [[ $line == *"test"* ]]; then
+              MINECRAFT_CHANGELOG+="- 🧪 **Potion Testing Complete!** ${line#*test*: }\n"
+            elif [[ $line == *"ci"* ]]; then
+              MINECRAFT_CHANGELOG+="- 🔧 **Automated Crafting Table Improved!** ${line#*ci*: }\n"
+            else
+              MINECRAFT_CHANGELOG+="- 🌟 **Magic Happened!** $line\n"
+            fi
+          done <<< "$CHANGELOG"
+          
+          # If no changes found, add a default message
+          if [ -z "$MINECRAFT_CHANGELOG" ]; then
+            MINECRAFT_CHANGELOG="- 🌟 **Magic Happened!** The Minecraft world has been improved in mysterious ways!\n"
+          fi
+          
+          # Save minecraft changelog to output with proper escaping
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$MINECRAFT_CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
       - name: Create GitHub Prerelease
         if: steps.tag_version.outputs.new_tag
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.tag_version.outputs.new_tag }}
           name: Beta Release ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+          body: |
+            **🎉 A new adventure is brewing! 🎉**
+            
+            We're excited to announce the beta release of version ${{ steps.tag_version.outputs.new_tag }}!
+            
+            **What's new in this Minecraft update?**
+            ${{ steps.minecraft_changelog.outputs.changelog }}
+            
+            **Prepare to test these new features and report any bugs!** 🌟
+            
+            Happy crafting! 🏰
           token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: true
           
@@ -114,9 +161,9 @@ jobs:
             **Get ready to embark on a new adventure!** 🌍
             
             Changes included in this release:
-            ${{ steps.tag_version.outputs.changelog }}
+            ${{ steps.minecraft_changelog.outputs.changelog }}
             
-            **Let’s craft, explore, and build together!** 🏰
+            **Let's craft, explore, and build together!** 🏰
           branch: ${{ github.ref }}
           base: master
           labels: |
