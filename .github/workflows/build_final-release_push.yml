@@ -6,10 +6,16 @@ on:
   push:
     branches:
       - 'master'
+  pull_request:
+    types: [closed]
+    branches:
+      - 'master'
 
 jobs:
-# This job runs when a GitHub release is published
+# This job runs when a GitHub release is published, PR is merged to master, or direct push to master
   deploy-to-dockerhub:
+    # Only run this job if the pull request was merged to master or it's a direct push to master or a release is published
+    if: (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master') || github.event_name == 'push' || github.event_name == 'release' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

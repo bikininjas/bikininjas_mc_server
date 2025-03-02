@@ -27,26 +27,24 @@ CONTAINER_ID=$(docker create bikininjas/minecraft-server:test)
 docker cp $CONTAINER_ID:/app/run.sh /tmp/run.sh 2>/dev/null || { echo "❌ ERROR: Server run script not found"; docker rm $CONTAINER_ID; exit 1; }
 echo "✅ Server run script found"
 
-# Check for NeoForge JAR
-docker cp $CONTAINER_ID:/app/libraries/net/neoforged/neoforge/21.1.122/neoforge-21.1.122-server.jar /tmp/neoforge-server.jar 2>/dev/null || { echo "❌ ERROR: NeoForge server JAR not found"; docker rm $CONTAINER_ID; exit 1; }
-echo "✅ NeoForge server JAR found"
+# Check for Paper JAR
+docker cp $CONTAINER_ID:/app/paper.jar /tmp/paper.jar 2>/dev/null || { echo "❌ ERROR: Paper server JAR not found"; docker rm $CONTAINER_ID; exit 1; }
+echo "✅ Paper server JAR found"
 
-# Check for Minecraft server JAR
-docker cp $CONTAINER_ID:/app/libraries/net/minecraft/server/1.21.1/server-1.21.1.jar /tmp/minecraft-server.jar 2>/dev/null || { echo "❌ ERROR: Minecraft server JAR not found"; docker rm $CONTAINER_ID; exit 1; }
-echo "✅ Minecraft server JAR found"
+# Paper includes Minecraft server, no need to check for separate Minecraft JAR
 
 # Check for plugins
-PLUGINS=("LuckPerms.jar" "SimpleVoiceChat.jar" "WorldEdit.jar" "Chunky.jar" "PlasmoVoice.jar" 
-         "ViaVersion.jar" "Dynmap.jar" "TAB.jar" "DiscordSRV.jar" "CoreProtect.jar")
+PLUGINS=("UltraPermissions.jar" "WorldEdit.jar" "Chunky.jar" 
+         "ViaVersion.jar" "Dynmap.jar" "TAB.jar" "DiscordSRV.jar" "CoreProtect.jar" 
+         "EssentialsX.jar" "VaultUnlocked.jar" "Multiverse-Core.jar" 
+         "UltraEconomy.jar" "ItemsAdder.jar" "Reforges.jar" "mcMMO.jar")
 
 for plugin in "${PLUGINS[@]}"; do
   docker cp $CONTAINER_ID:/app/plugins/$plugin /tmp/$plugin 2>/dev/null || { echo "❌ ERROR: Plugin $plugin not found"; docker rm $CONTAINER_ID; exit 1; }
   echo "✅ Plugin $plugin found"
 done
 
-# Check for mods
-docker cp $CONTAINER_ID:/app/mods/create-mod.jar /tmp/create-mod.jar 2>/dev/null || { echo "❌ ERROR: Create mod not found"; docker rm $CONTAINER_ID; exit 1; }
-echo "✅ Create mod found"
+# Paper doesn't use mods, it uses plugins which we've already checked
 
 # Check for config files
 CONFIG_FILES=("server.properties" "ops.json" "whitelist.json" "eula.txt")

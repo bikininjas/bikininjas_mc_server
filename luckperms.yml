@@ -1,7 +1,36 @@
-permissions:
-  users:
-    redPikPik:
-      permissions:
-        - '*'
-      options:
-        default: false
+# LuckPerms Configuration
+
+# The name of the server, used for server specific permissions.
+sever: main
+
+# The default assignments for new users.
+default-assignments:
+  # Should new users be set to default group by default
+  default-group: true
+
+# The database settings
+storage-method: yaml
+
+# Define permission groups
+groups:
+  admin:
+    permissions:
+      - '*'
+    display-name: '&4Admin'
+    weight: 100
+
+  default:
+    permissions:
+      - bukkit.command.help
+      - minecraft.command.me
+    display-name: '&7Default'
+    weight: 1
+
+# Define user permissions
+users:
+  redPikPik:
+    primary-group: admin
+    permissions:
+      - '*'
+    options:
+      default: false

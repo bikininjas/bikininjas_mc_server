@@ -1,0 +1,15 @@
+.git
+.github
+docs
+scripts
+tests
+CHANGELOG.md
+COMMIT_CONVENTION.md
+README.md
+cleanup_releases.sh
+run_tests.sh
+start.sh
+
+# Explicitly include jars directory
+!jars/
+!jars/*
