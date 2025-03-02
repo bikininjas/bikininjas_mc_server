@@ -63,8 +63,24 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ steps.get_tag.outputs.final_tag }}
             
+      - name: Check if Release Exists
+        id: check_release
+        run: |
+          # Check if a release with this tag already exists
+          RELEASE_EXISTS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ steps.get_tag.outputs.final_tag }}")
+          
+          if [ "$RELEASE_EXISTS" == "200" ]; then
+            echo "Release already exists for tag ${{ steps.get_tag.outputs.final_tag }}"
+            echo "release_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "No release found for tag ${{ steps.get_tag.outputs.final_tag }}"
+            echo "release_exists=false" >> $GITHUB_OUTPUT
+          fi
+      
       - name: Create GitHub Release
-        if: steps.get_tag.outputs.final_tag
+        if: steps.get_tag.outputs.final_tag && steps.check_release.outputs.release_exists != 'true'
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.get_tag.outputs.final_tag }}
@@ -72,9 +88,9 @@ jobs:
           body: |
             **🎉 Hooray! A new adventure awaits! 🎉**
             
-            We’re excited to announce the release of version ${{ steps.get_tag.outputs.final_tag }}!
+            We're excited to announce the release of version ${{ steps.get_tag.outputs.final_tag }}!
             
-            **What’s new?**
+            **What's new?**
             - No changelog available
             
             **Prepare to dive into the world of creativity and fun!** 🌟
