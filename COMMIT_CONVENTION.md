@@ -40,3 +40,31 @@ ci(workflow): configure auto-merge for PRs
 ```
 
 This convention makes the commit history more readable and automatically generates changelogs.
+
+## Using the Commit Helper Script
+
+We've included a helper script to make it easier to create conventional commits:
+
+```bash
+./scripts/commit.sh
+```
+
+This interactive script will guide you through creating a conventional commit by:
+
+1. Selecting a commit type from a list
+2. Entering an optional scope
+3. Writing a description
+4. Adding an optional body
+5. Adding an optional footer
+
+The script will then show you the formatted commit message and ask for confirmation before committing.
+
+## Converting Existing Commits
+
+For existing commits that don't follow the convention, you can use `git rebase -i` to edit commit messages:
+
+```bash
+git rebase -i HEAD~3  # To edit the last 3 commits
+```
+
+Change `pick` to `reword` for the commits you want to edit, then update the messages to follow the conventional format.
