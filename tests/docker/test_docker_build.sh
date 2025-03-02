@@ -6,7 +6,7 @@ set -e  # Exit on any error
 
 echo "=== Testing Docker Image Build ==="
 echo "Building Docker image..."
-docker build -t bikininjas/minecraft-server:test ..
+docker build -t bikininjas/minecraft-server:test ../../
 
 echo "Verifying Docker image..."
 # Check if the image exists

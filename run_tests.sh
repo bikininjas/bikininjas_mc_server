@@ -14,23 +14,17 @@ chmod +x tests/server/*.sh
 
 # Run Docker image tests
 echo "Running Docker image tests..."
-cd tests/docker
-./test_docker_build.sh
-cd ../..
+./tests/docker/test_docker_build.sh
 echo
 
 # Run server connectivity tests
 echo "Running server connectivity tests..."
-cd tests/server
-./test_server_connection.sh
-cd ../..
+./tests/server/test_server_connection.sh
 echo
 
 # Run plugin validation tests
 echo "Running plugin validation tests..."
-cd tests/server
-./test_plugins.sh
-cd ../..
+./tests/server/test_plugins.sh
 echo
 
 echo "===== ALL TESTS COMPLETED SUCCESSFULLY ====="

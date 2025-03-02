@@ -37,16 +37,12 @@ jobs:
       - name: Run Docker image tests
         run: |
           chmod +x tests/docker/test_docker_build.sh
-          cd tests/docker
-          ./test_docker_build.sh
-          cd ../..
+          ./tests/docker/test_docker_build.sh
           
       - name: Run basic server tests
         run: |
           chmod +x tests/server/test_server_connection.sh
-          cd tests/server
-          ./test_server_connection.sh
-          cd ../..
+          ./tests/server/test_server_connection.sh
           
       - name: Auto-merge if build successful
         if: success()
@@ -87,16 +83,12 @@ jobs:
       - name: Run Docker image tests
         run: |
           chmod +x tests/docker/test_docker_build.sh
-          cd tests/docker
-          ./test_docker_build.sh
-          cd ../..
+          ./tests/docker/test_docker_build.sh
           
       - name: Run basic server tests
         run: |
           chmod +x tests/server/test_server_connection.sh
-          cd tests/server
-          ./test_server_connection.sh
-          cd ../..
+          ./tests/server/test_server_connection.sh
 
   # This job runs only on pushes to master (including merged PRs) after tests pass
   tag-and-release:
