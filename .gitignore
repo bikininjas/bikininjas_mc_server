@@ -1,0 +1,37 @@
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Minecraft server specific files
+*.log
+*.log.gz
+logs/
+crash-reports/
+world/
+world_nether/
+world_the_end/
+libraries/
+versions/
+config/
+mods/
+plugins/
+cache/
+
+# Runtime files
+*.jar
+*.json
+!ops.json
+!whitelist.json
+!server.properties
+!luckperms.yml
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db

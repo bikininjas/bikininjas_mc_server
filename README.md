@@ -6,7 +6,7 @@ This is a magical Docker image for running your very own Minecraft server with J
 
 ## Server Information
 
-This server runs on NeoForge 1.21.1-47.1.0 with Java 21, providing a stable and feature-rich environment for your Minecraft adventures!
+This server runs on NeoForge 21.1.122 with Java 21, providing a stable and feature-rich environment for your Minecraft adventures!
 
 ## Top 10 NeoForge Plugins
 
@@ -55,5 +55,27 @@ In this magical realm, the player "redPikPik" is the supreme admin, wielding the
 2. Run the container with port 25565 exposed
 3. Connect to your server using Minecraft Java Edition 1.21.1
 4. Enjoy your adventure!
+
+## Server Configuration
+
+The server is pre-configured with optimal settings for performance and gameplay:
+
+- **Server Name**: Bikininjas World
+- **Admin**: redPikPik has full administrative privileges
+- **Performance**: Optimized Java 21 flags for maximum performance
+- **Memory**: 4GB allocated for smooth gameplay
+- **Command Blocks**: Enabled for advanced creations
+- **View Distance**: 10 chunks for balance between performance and visibility
+
+## Java 21 Optimization
+
+This server uses Aikar's optimized JVM flags for Java 21, which provide:
+
+- Improved garbage collection with G1GC
+- Reduced lag spikes and stuttering
+- Better memory management
+- Overall smoother gameplay experience
+
+You can run the server outside Docker using the included `start.sh` script, which contains the same optimized settings.
 
 Get ready to craft, explore, and build your own Minecraft adventure! If you have any questions or need help, just shout! 📣
