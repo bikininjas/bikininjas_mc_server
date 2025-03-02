@@ -30,7 +30,11 @@ jobs:
           if [[ "${{ github.event_name }}" == "release" ]]; then
             RELEASE_TAG=${{ github.event.release.tag_name }}
           else
-            RELEASE_TAG=$(git describe --tags --abbrev=0)
+            # Try to get the latest tag, if it fails use a default tag
+            RELEASE_TAG=$(git tag --sort=-committerdate | head -n 1 || echo "v0.1.0")
+            if [ -z "$RELEASE_TAG" ]; then
+              RELEASE_TAG="v0.1.0"
+            fi
           fi
           echo "release_tag=${RELEASE_TAG}" >> $GITHUB_OUTPUT
           # Remove beta suffix if present
