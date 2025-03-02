@@ -4,6 +4,15 @@
 
 This is a magical Docker image for running your very own Minecraft server with Java 21! 🏰✨ Dive into the world of creativity with the top NeoForge plugins and the amazing Create mod!
 
+## Development & Release Process
+
+This project follows semantic versioning and uses an automated CI/CD pipeline for releases:
+
+- **Beta Releases**: Automatically created when code is pushed to a branch
+- **Final Releases**: Promoted from beta releases and pushed to Docker Hub
+
+For more details, see [Release Process](docs/RELEASE_PROCESS.md).
+
 ## Server Information
 
 This server runs on NeoForge 21.1.122 with Java 21, providing a stable and feature-rich environment for your Minecraft adventures!
