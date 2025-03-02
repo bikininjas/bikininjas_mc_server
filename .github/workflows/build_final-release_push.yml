@@ -63,21 +63,40 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ steps.get_tag.outputs.final_tag }}
             
-      - name: Check if Release Exists
+      - name: Check Release Status
         id: check_release
         run: |
-          # Check if a release with this tag already exists
-          RELEASE_EXISTS=$(curl -s -o /dev/null -w "%{http_code}" \
+          # Get the release info for the tag
+          RELEASE_INFO=$(curl -s \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ steps.get_tag.outputs.final_tag }}")
           
-          if [ "$RELEASE_EXISTS" == "200" ]; then
-            echo "Release already exists for tag ${{ steps.get_tag.outputs.final_tag }}"
+          # Extract release ID and prerelease status
+          RELEASE_ID=$(echo "$RELEASE_INFO" | jq -r '.id // ""')
+          IS_PRERELEASE=$(echo "$RELEASE_INFO" | jq -r '.prerelease // false')
+          
+          if [ -n "$RELEASE_ID" ]; then
+            echo "Found release ID: $RELEASE_ID for tag ${{ steps.get_tag.outputs.final_tag }}"
+            echo "Release is prerelease: $IS_PRERELEASE"
+            echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
+            echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
             echo "release_exists=true" >> $GITHUB_OUTPUT
           else
             echo "No release found for tag ${{ steps.get_tag.outputs.final_tag }}"
             echo "release_exists=false" >> $GITHUB_OUTPUT
           fi
+      
+      - name: Update Pre-release to Full Release
+        if: steps.check_release.outputs.release_exists == 'true' && steps.check_release.outputs.is_prerelease == 'true'
+        run: |
+          # Update the release to make it a full release
+          curl -X PATCH \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{"prerelease": false, "make_latest": "true"}' \
+            "https://api.github.com/repos/${{ github.repository }}/releases/${{ steps.check_release.outputs.release_id }}"
+          
+          echo "Updated release ${{ steps.check_release.outputs.release_id }} to a full release"
       
       - name: Generate Changelog
         id: changelog
