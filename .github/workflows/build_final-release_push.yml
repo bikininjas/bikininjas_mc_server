@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.7
+        with:
+          fetch-depth: 0  # Fetch all history and tags
         
       - name: Docker Setup Buildx
         uses: docker/setup-buildx-action@v3.3.0
@@ -27,18 +29,29 @@ jobs:
       - name: Get Release Tag
         id: get_tag
         run: |
+          # Ensure we have all tags
+          git fetch --tags --force
+          
           if [[ "${{ github.event_name }}" == "release" ]]; then
             RELEASE_TAG=${{ github.event.release.tag_name }}
+            echo "Using release tag: ${RELEASE_TAG}"
           else
-            # Try to get the latest tag, if it fails use a default tag
-            RELEASE_TAG=$(git tag --sort=-committerdate | head -n 1 || echo "v0.1.0")
+            # Get the latest tag
+            RELEASE_TAG=$(git tag --sort=-v:refname | head -n 1)
+            echo "Found latest tag: ${RELEASE_TAG}"
+            
+            # If no tag exists, create a new one based on semantic versioning
             if [ -z "$RELEASE_TAG" ]; then
+              echo "No existing tags found, creating initial tag"
               RELEASE_TAG="v0.1.0"
             fi
           fi
+          
           echo "release_tag=${RELEASE_TAG}" >> $GITHUB_OUTPUT
+          
           # Remove beta suffix if present
           FINAL_TAG=$(echo "${RELEASE_TAG}" | sed 's/-beta.*//g')
+          echo "Using final tag: ${FINAL_TAG}"
           echo "final_tag=${FINAL_TAG}" >> $GITHUB_OUTPUT
           
       - name: Docker metadata
