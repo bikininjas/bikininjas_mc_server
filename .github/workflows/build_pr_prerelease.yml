@@ -22,20 +22,16 @@ jobs:
       - name: Docker Setup Buildx
         uses: docker/setup-buildx-action@v3.3.0
         
-      - name: Build Docker image (no push)
-        uses: docker/build-push-action@v6.2.0
-        with:
-          push: false
-          context: .
-          tags: bikininjas/minecraft-server:test
-          load: true
-          
-      - name: Install test dependencies
+      - name: Build Docker image and run tests
+        id: build_and_test
         run: |
+          # Install test dependencies
           pip install mcstatus
           
-      - name: Run Docker image tests
-        run: |
+          # Build the Docker image
+          docker build -t bikininjas/minecraft-server:test .
+          
+          # Run tests on the built image
           chmod +x tests/docker/test_docker_build.sh
           ./tests/docker/test_docker_build.sh
           
@@ -69,21 +65,16 @@ jobs:
       - name: Docker Setup Buildx
         uses: docker/setup-buildx-action@v3.3.0
         
-      - name: Build Docker image (no push)
-        uses: docker/build-push-action@v6.2.0
-        with:
-          push: false
-          context: .
-          tags: bikininjas/minecraft-server:test
-          load: true
-          
-      - name: Install test dependencies
+      - name: Build Docker image and run tests
+        id: build_and_test
         run: |
+          # Install test dependencies
           pip install mcstatus
           
-      - name: Run Docker image tests
-        id: docker_tests
-        run: |
+          # Build the Docker image
+          docker build -t bikininjas/minecraft-server:test .
+          
+          # Run tests on the built image
           chmod +x tests/docker/test_docker_build.sh
           ./tests/docker/test_docker_build.sh
       
