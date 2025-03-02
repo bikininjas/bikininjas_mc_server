@@ -22,13 +22,13 @@ RUN curl -o /app/paper.jar https://api.papermc.io/v2/projects/paper/versions/${P
 RUN curl -L -o /app/plugins/WorldEdit.jar https://cdn.modrinth.com/data/1u6JkXh5/versions/Bu1zaaoc/worldedit-bukkit-7.3.9.jar && \
     curl -L -o /app/plugins/Chunky.jar https://cdn.modrinth.com/data/fALzjamp/versions/ytBhnGfO/Chunky-Bukkit-1.4.28.jar && \
     curl -L -o /app/plugins/ViaVersion.jar https://cdn.modrinth.com/data/P1OZGk5p/versions/Wry9t810/ViaVersion-5.2.2-SNAPSHOT.jar && \
-    curl -L -o /app/plugins/Dynmap.jar https://cdn.modrinth.com/data/fRQREgAc/versions/1pMUPhY2/Dynmap-3.7-beta-8-fabric-1.21.jar && \
+    curl -L -o /app/plugins/Dynmap.jar https://cdn.modrinth.com/data/fRQREgAc/versions/ImNNT17B/Dynmap-3.7-beta-8-spigot.jar && \
     curl -L -o /app/plugins/TAB.jar https://github.com/NEZNAMY/TAB/releases/download/5.0.7/TAB.v5.0.7.jar && \
     curl -L -o /app/plugins/DiscordSRV.jar https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.27.0/DiscordSRV-Build-1.27.0.jar && \
     curl -L -o /app/plugins/CoreProtect.jar https://cdn.modrinth.com/data/Lu3KuzdV/versions/mvLpRWww/CoreProtect-21.3.jar && \
     curl -L -o /app/plugins/EssentialsX.jar https://github.com/EssentialsX/Essentials/releases/download/2.20.1/EssentialsX-2.20.1.jar && \
     curl -L -o /app/plugins/VaultUnlocked.jar https://cdn.modrinth.com/data/ayRaM8J7/versions/fC53e1Vr/VaultUnlocked-2.9.0.jar && \
-    curl -L -o /app/plugins/Multiverse-Core.jar https://media.forgecdn.net/files/4580/385/Multiverse-Core-4.3.11.jar
+    curl -L -o /app/plugins/Multiverse-Core.jar https://cdn.modrinth.com/data/3wmN97b8/versions/jbQopAkk/multiverse-core-4.3.14.jar
 
 # Copy custom jar files from local directory
 COPY jars/UltraPermissions-5.6.4.jar /app/plugins/UltraPermissions.jar
