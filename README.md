@@ -78,4 +78,29 @@ This server uses Aikar's optimized JVM flags for Java 21, which provide:
 
 You can run the server outside Docker using the included `start.sh` script, which contains the same optimized settings.
 
+## Testing
+
+This project includes comprehensive testing to ensure everything works correctly:
+
+- **Docker Image Tests**: Verify that the Docker image builds correctly and contains all required files
+- **Server Connectivity Tests**: Ensure the server starts up and accepts connections
+- **Plugin Validation Tests**: Check that all plugins and mods load correctly
+
+To run all tests:
+
+```bash
+./run_tests.sh
+```
+
+See the [tests/README.md](tests/README.md) for more details on individual tests.
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+- Automatically builds and tests the Docker image when pull requests are created
+- Auto-merges PRs to master if all tests pass
+- Creates semantic version tags and releases when changes are merged to master
+- Deploys the Docker image to Docker Hub with appropriate tags
+
 Get ready to craft, explore, and build your own Minecraft adventure! If you have any questions or need help, just shout! 📣
