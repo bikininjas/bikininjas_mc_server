@@ -12,7 +12,7 @@ RUN apt-get update && \
 RUN mkdir -p /app/mods /app/plugins
 
 # Download NeoForge and server files
-RUN curl -o neoforge-installer.jar https://maven.neoforged.net/releases/net/neoforged/neoforge/1.21.1-47.1.0/neoforge-1.21.1-47.1.0-installer.jar && \
+RUN curl -o neoforge-installer.jar https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.122/neoforge-21.1.122-installer.jar && \
     java -jar neoforge-installer.jar --installServer && \
     rm neoforge-installer.jar
 

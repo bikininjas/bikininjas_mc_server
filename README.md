@@ -6,7 +6,7 @@ This is a magical Docker image for running your very own Minecraft server with J
 
 ## Server Information
 
-This server runs on NeoForge 1.21.1-47.1.0 with Java 21, providing a stable and feature-rich environment for your Minecraft adventures!
+This server runs on NeoForge 21.1.122 with Java 21, providing a stable and feature-rich environment for your Minecraft adventures!
 
 ## Top 10 NeoForge Plugins
 
