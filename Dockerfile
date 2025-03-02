@@ -11,8 +11,8 @@ RUN apt-get update && \
 # Create directories for mods and plugins
 RUN mkdir -p /app/mods /app/plugins
 
-# Download NeoForge and server files
-RUN curl -o neoforge-installer.jar https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.122/neoforge-21.1.122-installer.jar && \
+# Download NeoForge and server files (using version 21.1.125 or newer for Create mod compatibility)
+RUN curl -o neoforge-installer.jar https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.127/neoforge-21.1.127-installer.jar && \
     java -jar neoforge-installer.jar --installServer && \
     rm neoforge-installer.jar
 
