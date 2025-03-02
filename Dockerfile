@@ -19,8 +19,7 @@ ENV PAPER_BUILD=99
 RUN curl -o /app/paper.jar https://api.papermc.io/v2/projects/paper/versions/${PAPER_VERSION}/builds/${PAPER_BUILD}/downloads/paper-${PAPER_VERSION}-${PAPER_BUILD}.jar
 
 # Download plugins compatible with 1.21.1
-RUN curl -L -o /app/plugins/LuckPerms.jar https://download.luckperms.net/1573/bukkit/loader/LuckPerms-Bukkit-5.4.156.jar && \
-    curl -L -o /app/plugins/WorldEdit.jar https://cdn.modrinth.com/data/1u6JkXh5/versions/Bu1zaaoc/worldedit-bukkit-7.3.9.jar && \
+RUN curl -L -o /app/plugins/WorldEdit.jar https://cdn.modrinth.com/data/1u6JkXh5/versions/Bu1zaaoc/worldedit-bukkit-7.3.9.jar && \
     curl -L -o /app/plugins/Chunky.jar https://cdn.modrinth.com/data/fALzjamp/versions/ytBhnGfO/Chunky-Bukkit-1.4.28.jar && \
     curl -L -o /app/plugins/ViaVersion.jar https://cdn.modrinth.com/data/P1OZGk5p/versions/Wry9t810/ViaVersion-5.2.2-SNAPSHOT.jar && \
     curl -L -o /app/plugins/Dynmap.jar https://cdn.modrinth.com/data/fRQREgAc/versions/1pMUPhY2/Dynmap-3.7-beta-8-fabric-1.21.jar && \
@@ -28,8 +27,15 @@ RUN curl -L -o /app/plugins/LuckPerms.jar https://download.luckperms.net/1573/bu
     curl -L -o /app/plugins/DiscordSRV.jar https://github.com/DiscordSRV/DiscordSRV/releases/download/v1.27.0/DiscordSRV-Build-1.27.0.jar && \
     curl -L -o /app/plugins/CoreProtect.jar https://cdn.modrinth.com/data/Lu3KuzdV/versions/mvLpRWww/CoreProtect-21.3.jar && \
     curl -L -o /app/plugins/EssentialsX.jar https://github.com/EssentialsX/Essentials/releases/download/2.20.1/EssentialsX-2.20.1.jar && \
-    curl -L -o /app/plugins/Multiverse-Core.jar https://media.forgecdn.net/files/4580/385/Multiverse-Core-4.3.11.jar && \
-    curl -L -o /app/plugins/UltraPermissions.jar https://www.spigotmc.org/resources/ultra-permissions.42678/download?version=569283
+    curl -L -o /app/plugins/VaultUnlocked.jar https://cdn.modrinth.com/data/ayRaM8J7/versions/fC53e1Vr/VaultUnlocked-2.9.0.jar && \
+    curl -L -o /app/plugins/Multiverse-Core.jar https://media.forgecdn.net/files/4580/385/Multiverse-Core-4.3.11.jar
+
+# Copy custom jar files from local directory
+COPY jars/UltraPermissions-5.6.4.jar /app/plugins/UltraPermissions.jar
+COPY jars/UltraEconomy-2.10.3.jar /app/plugins/UltraEconomy.jar
+COPY jars/ItemsAdder_4.0.8.jar /app/plugins/ItemsAdder.jar
+COPY jars/Reforges-v6.73.0.jar /app/plugins/Reforges.jar
+COPY jars/mcMMO.jar /app/plugins/mcMMO.jar
 
 # Create server configuration files
 COPY server.properties /app/server.properties
@@ -37,7 +43,7 @@ COPY paper.yml /app/paper.yml
 COPY spigot.yml /app/spigot.yml
 COPY bukkit.yml /app/bukkit.yml
 COPY commands.yml /app/commands.yml
-COPY luckperms.yml /app/plugins/luckperms/luckperms.yml
+# No longer using LuckPerms configuration
 COPY ops.json /app/ops.json
 COPY whitelist.json /app/whitelist.json
 
