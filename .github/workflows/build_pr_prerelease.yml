@@ -78,23 +78,45 @@ jobs:
           # Convert conventional commits to Minecraft-themed changelog
           MINECRAFT_CHANGELOG=""
           while IFS= read -r line; do
-            if [[ $line == *"feat"* ]]; then
-              MINECRAFT_CHANGELOG+="- 💎 **New Diamond Ore Found!** ${line#*feat*: }\n"
-            elif [[ $line == *"fix"* ]]; then
-              MINECRAFT_CHANGELOG+="- 🛠️ **Creeper Explosion Fixed!** ${line#*fix*: }\n"
-            elif [[ $line == *"perf"* ]]; then
-              MINECRAFT_CHANGELOG+="- ⚡ **Redstone Circuit Optimized!** ${line#*perf*: }\n"
-            elif [[ $line == *"docs"* ]]; then
-              MINECRAFT_CHANGELOG+="- 📚 **Added to the Book of Knowledge!** ${line#*docs*: }\n"
-            elif [[ $line == *"style"* ]]; then
-              MINECRAFT_CHANGELOG+="- 🎨 **Texture Pack Updated!** ${line#*style*: }\n"
-            elif [[ $line == *"refactor"* ]]; then
-              MINECRAFT_CHANGELOG+="- 🔄 **Village Restructured!** ${line#*refactor*: }\n"
-            elif [[ $line == *"test"* ]]; then
-              MINECRAFT_CHANGELOG+="- 🧪 **Potion Testing Complete!** ${line#*test*: }\n"
-            elif [[ $line == *"ci"* ]]; then
-              MINECRAFT_CHANGELOG+="- 🔧 **Automated Crafting Table Improved!** ${line#*ci*: }\n"
+            # Extract the commit type and message using regex
+            if [[ $line =~ ^([a-z]+)\(([a-z0-9_-]+)\)?(!)?: (.+)$ ]]; then
+              TYPE="${BASH_REMATCH[1]}"
+              SCOPE="${BASH_REMATCH[2]}"
+              MESSAGE="${BASH_REMATCH[4]}"
+              
+              # Format based on commit type
+              case "$TYPE" in
+                feat)
+                  MINECRAFT_CHANGELOG+="- 💎 **New Diamond Ore Found!** $MESSAGE\n"
+                  ;;
+                fix)
+                  MINECRAFT_CHANGELOG+="- 🛠️ **Creeper Explosion Fixed!** $MESSAGE\n"
+                  ;;
+                perf)
+                  MINECRAFT_CHANGELOG+="- ⚡ **Redstone Circuit Optimized!** $MESSAGE\n"
+                  ;;
+                docs)
+                  MINECRAFT_CHANGELOG+="- 📚 **Added to the Book of Knowledge!** $MESSAGE\n"
+                  ;;
+                style)
+                  MINECRAFT_CHANGELOG+="- 🎨 **Texture Pack Updated!** $MESSAGE\n"
+                  ;;
+                refactor)
+                  MINECRAFT_CHANGELOG+="- 🔄 **Village Restructured!** $MESSAGE\n"
+                  ;;
+                test)
+                  MINECRAFT_CHANGELOG+="- 🧪 **Potion Testing Complete!** $MESSAGE\n"
+                  ;;
+                ci)
+                  MINECRAFT_CHANGELOG+="- 🔧 **Automated Crafting Table Improved!** $MESSAGE\n"
+                  ;;
+                *)
+                  # For other types or non-conventional commits
+                  MINECRAFT_CHANGELOG+="- 🌟 **Magic Happened!** $MESSAGE\n"
+                  ;;
+              esac
             else
+              # Fallback for non-conventional commits
               MINECRAFT_CHANGELOG+="- 🌟 **Magic Happened!** $line\n"
             fi
           done <<< "$CHANGELOG"
