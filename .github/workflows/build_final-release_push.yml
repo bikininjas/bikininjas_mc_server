@@ -155,23 +155,45 @@ jobs:
           # Convert commits to Minecraft-themed changelog
           CHANGELOG=""
           while IFS= read -r commit; do
-            if [[ $commit == feat* ]]; then
-              CHANGELOG+="- 💎 **New Diamond Ore Found!** ${commit#feat*: }\n"
-            elif [[ $commit == fix* ]]; then
-              CHANGELOG+="- 🛠️ **Creeper Explosion Fixed!** ${commit#fix*: }\n"
-            elif [[ $commit == perf* ]]; then
-              CHANGELOG+="- ⚡ **Redstone Circuit Optimized!** ${commit#perf*: }\n"
-            elif [[ $commit == docs* ]]; then
-              CHANGELOG+="- 📚 **Added to the Book of Knowledge!** ${commit#docs*: }\n"
-            elif [[ $commit == style* ]]; then
-              CHANGELOG+="- 🎨 **Texture Pack Updated!** ${commit#style*: }\n"
-            elif [[ $commit == refactor* ]]; then
-              CHANGELOG+="- 🔄 **Village Restructured!** ${commit#refactor*: }\n"
-            elif [[ $commit == test* ]]; then
-              CHANGELOG+="- 🧪 **Potion Testing Complete!** ${commit#test*: }\n"
-            elif [[ $commit == ci* ]]; then
-              CHANGELOG+="- 🔧 **Automated Crafting Table Improved!** ${commit#ci*: }\n"
+            # Extract the commit type and message using regex
+            if [[ $commit =~ ^([a-z]+)\(([a-z0-9_-]+)\)?(!)?: (.+)$ ]]; then
+              TYPE="${BASH_REMATCH[1]}"
+              SCOPE="${BASH_REMATCH[2]}"
+              MESSAGE="${BASH_REMATCH[4]}"
+              
+              # Format based on commit type
+              case "$TYPE" in
+                feat)
+                  CHANGELOG+="- 💎 **New Diamond Ore Found!** $MESSAGE\n"
+                  ;;
+                fix)
+                  CHANGELOG+="- 🛠️ **Creeper Explosion Fixed!** $MESSAGE\n"
+                  ;;
+                perf)
+                  CHANGELOG+="- ⚡ **Redstone Circuit Optimized!** $MESSAGE\n"
+                  ;;
+                docs)
+                  CHANGELOG+="- 📚 **Added to the Book of Knowledge!** $MESSAGE\n"
+                  ;;
+                style)
+                  CHANGELOG+="- 🎨 **Texture Pack Updated!** $MESSAGE\n"
+                  ;;
+                refactor)
+                  CHANGELOG+="- 🔄 **Village Restructured!** $MESSAGE\n"
+                  ;;
+                test)
+                  CHANGELOG+="- 🧪 **Potion Testing Complete!** $MESSAGE\n"
+                  ;;
+                ci)
+                  CHANGELOG+="- 🔧 **Automated Crafting Table Improved!** $MESSAGE\n"
+                  ;;
+                *)
+                  # For other types or non-conventional commits
+                  CHANGELOG+="- 🌟 **Magic Happened!** $MESSAGE\n"
+                  ;;
+              esac
             else
+              # Fallback for non-conventional commits
               CHANGELOG+="- 🌟 **Magic Happened!** $commit\n"
             fi
           done <<< "$COMMITS"
