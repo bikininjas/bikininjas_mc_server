@@ -15,7 +15,7 @@ jobs:
 # This job runs when a GitHub release is published, PR is merged to master, or direct push to master
   deploy-to-dockerhub:
     # Only run this job if the pull request was merged to master or it's a direct push to master or a release is published
-    if: (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master') || github.event_name == 'push' || github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    if: (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master') || (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'release' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,6 +50,22 @@ jobs:
             if [ -z "$RELEASE_TAG" ]; then
               echo "No existing tags found, creating initial tag"
               RELEASE_TAG="v0.1.0"
+            fi
+            
+            # For master branch, create a new tag with incremented patch version
+            if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+              # Extract version components
+              if [[ $RELEASE_TAG =~ v([0-9]+)\.([0-9]+)\.([0-9]+) ]]; then
+                MAJOR=${BASH_REMATCH[1]}
+                MINOR=${BASH_REMATCH[2]}
+                PATCH=${BASH_REMATCH[3]}
+                
+                # Increment patch version
+                PATCH=$((PATCH + 1))
+                NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+                echo "Creating new tag: ${NEW_TAG}"
+                RELEASE_TAG="${NEW_TAG}"
+              fi
             fi
           fi
           
@@ -170,8 +186,16 @@ jobs:
           echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
       
+      - name: Create Tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git tag -a ${{ steps.get_tag.outputs.final_tag }} -m "Release ${{ steps.get_tag.outputs.final_tag }}"
+          git push origin ${{ steps.get_tag.outputs.final_tag }}
+      
       - name: Create GitHub Release
-        if: steps.get_tag.outputs.final_tag && steps.check_release.outputs.release_exists != 'true'
+        if: steps.get_tag.outputs.final_tag && (steps.check_release.outputs.release_exists != 'true' || github.ref == 'refs/heads/master')
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.get_tag.outputs.final_tag }}
