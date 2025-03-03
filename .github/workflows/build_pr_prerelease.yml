@@ -38,7 +38,7 @@ jobs:
       # Only run the remaining steps for pushes to non-master branches or workflow dispatch
       - name: Set up Python
         if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/master'))
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
           
