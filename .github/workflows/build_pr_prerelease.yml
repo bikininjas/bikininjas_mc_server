@@ -6,32 +6,14 @@ on:
       - synchronize
       - reopened
   workflow_dispatch:
+  push:
+    branches-ignore:
+      - 'master'
 
 jobs:
-  build-and-test-pr:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4.1.7
-        
-      - name: Docker Setup Buildx
-        uses: docker/setup-buildx-action@v3.3.0
-        
-      - name: Build Docker image and run tests
-        id: build_and_test
-        run: |
-          # Install test dependencies
-          pip install mcstatus
-          
-          # Build the Docker image
-          docker build -t bikininjas/minecraft-server:test .
-          
-          # Run tests on the built image
-          chmod +x tests/docker/test_docker_build.sh
-          ./tests/docker/test_docker_build.sh
-          
-  build-and-test-master:
-    if: github.event_name == 'workflow_dispatch'
+  build-and-test:
+    # Run this job for pull requests, workflow dispatch, or pushes to non-master branches
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/master'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -53,17 +35,21 @@ jobs:
           chmod +x tests/docker/test_docker_build.sh
           ./tests/docker/test_docker_build.sh
       
+      # Only run the remaining steps for pushes to non-master branches or workflow dispatch
       - name: Set up Python
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/master'))
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
           
       - name: Install dependencies
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/master'))
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           
       - name: Run Python tests
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/master'))
         run: |
           if [ -f run_tests.sh ]; then
             chmod +x run_tests.sh
@@ -71,6 +57,7 @@ jobs:
           fi
           
       - name: Create Semantic Version Tag
+        if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/master'))
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
         with:
@@ -83,34 +70,64 @@ jobs:
           
       - name: Generate Minecraft Changelog
         id: minecraft_changelog
-        if: steps.tag_version.outputs.new_tag
+        if: (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/master'))) && steps.tag_version.outputs.new_tag
         run: |
-          # Get the changelog from tag_version
-          CHANGELOG="${{ steps.tag_version.outputs.changelog }}"
+          # Get the changelog from tag_version and save to a file to avoid shell interpretation issues
+          echo "${{ steps.tag_version.outputs.changelog }}" > /tmp/changelog.txt
           
           # Convert conventional commits to Minecraft-themed changelog
           MINECRAFT_CHANGELOG=""
           while IFS= read -r line; do
-            if [[ $line == *"feat"* ]]; then
-              MINECRAFT_CHANGELOG+="- 💎 **New Diamond Ore Found!** ${line#*feat*: }\n"
-            elif [[ $line == *"fix"* ]]; then
-              MINECRAFT_CHANGELOG+="- 🛠️ **Creeper Explosion Fixed!** ${line#*fix*: }\n"
-            elif [[ $line == *"perf"* ]]; then
-              MINECRAFT_CHANGELOG+="- ⚡ **Redstone Circuit Optimized!** ${line#*perf*: }\n"
-            elif [[ $line == *"docs"* ]]; then
-              MINECRAFT_CHANGELOG+="- 📚 **Added to the Book of Knowledge!** ${line#*docs*: }\n"
-            elif [[ $line == *"style"* ]]; then
-              MINECRAFT_CHANGELOG+="- 🎨 **Texture Pack Updated!** ${line#*style*: }\n"
-            elif [[ $line == *"refactor"* ]]; then
-              MINECRAFT_CHANGELOG+="- 🔄 **Village Restructured!** ${line#*refactor*: }\n"
-            elif [[ $line == *"test"* ]]; then
-              MINECRAFT_CHANGELOG+="- 🧪 **Potion Testing Complete!** ${line#*test*: }\n"
-            elif [[ $line == *"ci"* ]]; then
-              MINECRAFT_CHANGELOG+="- 🔧 **Automated Crafting Table Improved!** ${line#*ci*: }\n"
+            # Skip empty lines and lines that don't look like commits
+            if [ -z "$line" ] || [[ "$line" == "###"* ]]; then
+              continue
+            fi
+            
+            # Try to match conventional commit format
+            if [[ "$line" =~ ^[[:space:]]*\*[[:space:]]+([a-z]+)(\([a-z0-9_-]+\))?: ]]; then
+              # Extract the type from the match
+              TYPE="${BASH_REMATCH[1]}"
+              
+              # Get the message by removing the matched prefix
+              PREFIX="${BASH_REMATCH[0]}"
+              MESSAGE="${line#$PREFIX}"
+              
+              # Format based on commit type
+              case "$TYPE" in
+                feat)
+                  MINECRAFT_CHANGELOG+="- 💎 **New Diamond Ore Found!** $MESSAGE\n"
+                  ;;
+                fix)
+                  MINECRAFT_CHANGELOG+="- 🛠️ **Creeper Explosion Fixed!** $MESSAGE\n"
+                  ;;
+                perf)
+                  MINECRAFT_CHANGELOG+="- ⚡ **Redstone Circuit Optimized!** $MESSAGE\n"
+                  ;;
+                docs)
+                  MINECRAFT_CHANGELOG+="- 📚 **Added to the Book of Knowledge!** $MESSAGE\n"
+                  ;;
+                style)
+                  MINECRAFT_CHANGELOG+="- 🎨 **Texture Pack Updated!** $MESSAGE\n"
+                  ;;
+                refactor)
+                  MINECRAFT_CHANGELOG+="- 🔄 **Village Restructured!** $MESSAGE\n"
+                  ;;
+                test)
+                  MINECRAFT_CHANGELOG+="- 🧪 **Potion Testing Complete!** $MESSAGE\n"
+                  ;;
+                ci)
+                  MINECRAFT_CHANGELOG+="- 🔧 **Automated Crafting Table Improved!** $MESSAGE\n"
+                  ;;
+                *)
+                  # For other types or non-conventional commits
+                  MINECRAFT_CHANGELOG+="- 🌟 **Magic Happened!** $MESSAGE\n"
+                  ;;
+              esac
             else
+              # Fallback for non-conventional commits
               MINECRAFT_CHANGELOG+="- 🌟 **Magic Happened!** $line\n"
             fi
-          done <<< "$CHANGELOG"
+          done < /tmp/changelog.txt
           
           # If no changes found, add a default message
           if [ -z "$MINECRAFT_CHANGELOG" ]; then
@@ -123,7 +140,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
       
       - name: Create GitHub Prerelease
-        if: steps.tag_version.outputs.new_tag
+        if: (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/master'))) && steps.tag_version.outputs.new_tag
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.tag_version.outputs.new_tag }}
@@ -143,7 +160,7 @@ jobs:
           prerelease: true
           
       - name: Create Pull Request if not exists
-        if: github.event_name == 'workflow_dispatch' && !startsWith(github.ref, 'refs/heads/master')
+        if: (github.event_name == 'workflow_dispatch' || github.event_name == 'push') && !startsWith(github.ref, 'refs/heads/master')
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
