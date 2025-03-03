@@ -146,22 +146,26 @@ jobs:
           
           if [ -z "$PREV_TAG" ]; then
             # If there's no previous tag, get all commits
-            COMMITS=$(git log --pretty=format:"%s" | head -n 10)
+            git log --pretty=format:"%s" | head -n 10 > /tmp/commits.txt
           else
             # Get commits between tags
-            COMMITS=$(git log --pretty=format:"%s" $PREV_TAG..HEAD | head -n 10)
+            git log --pretty=format:"%s" $PREV_TAG..HEAD | head -n 10 > /tmp/commits.txt
           fi
           
           # Convert commits to Minecraft-themed changelog
           CHANGELOG=""
           while IFS= read -r commit; do
-            # Extract the commit type and message using regex
-            # Use a safer approach to extract commit parts
-            if [[ "$commit" =~ ^([a-z]+)\(([a-z0-9_-]+)\)?(!)?: ]]; then
-              # Extract the type and scope
+            # Skip empty lines and lines that don't look like commits
+            if [ -z "$commit" ] || [[ "$commit" == "###"* ]]; then
+              continue
+            fi
+            
+            # Try to match conventional commit format
+            if [[ "$commit" =~ ^([a-z]+)\(([a-z0-9_-]+)\)?: ]]; then
+              # Extract the type from the match
               TYPE="${BASH_REMATCH[1]}"
-              SCOPE="${BASH_REMATCH[2]}"
-              # Extract the message part safely by removing the type(scope): prefix
+              
+              # Get the message by removing the matched prefix
               PREFIX="${BASH_REMATCH[0]}"
               MESSAGE="${commit#$PREFIX}"
               
@@ -200,7 +204,7 @@ jobs:
               # Fallback for non-conventional commits
               CHANGELOG+="- 🌟 **Magic Happened!** $commit\n"
             fi
-          done <<< "$COMMITS"
+          done < /tmp/commits.txt
           
           # If no commits found, add a default message
           if [ -z "$CHANGELOG" ]; then

@@ -72,19 +72,23 @@ jobs:
         id: minecraft_changelog
         if: (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/master'))) && steps.tag_version.outputs.new_tag
         run: |
-          # Get the changelog from tag_version
-          CHANGELOG="${{ steps.tag_version.outputs.changelog }}"
+          # Get the changelog from tag_version and save to a file to avoid shell interpretation issues
+          echo "${{ steps.tag_version.outputs.changelog }}" > /tmp/changelog.txt
           
           # Convert conventional commits to Minecraft-themed changelog
           MINECRAFT_CHANGELOG=""
           while IFS= read -r line; do
-            # Extract the commit type and message using regex
-            # Use a safer approach to extract commit parts
-            if [[ "$line" =~ ^([a-z]+)\(([a-z0-9_-]+)\)?(!)?: ]]; then
-              # Extract the type and scope
+            # Skip empty lines and lines that don't look like commits
+            if [ -z "$line" ] || [[ "$line" == "###"* ]]; then
+              continue
+            fi
+            
+            # Try to match conventional commit format
+            if [[ "$line" =~ ^[[:space:]]*\*[[:space:]]+([a-z]+)(\([a-z0-9_-]+\))?: ]]; then
+              # Extract the type from the match
               TYPE="${BASH_REMATCH[1]}"
-              SCOPE="${BASH_REMATCH[2]}"
-              # Extract the message part safely by removing the type(scope): prefix
+              
+              # Get the message by removing the matched prefix
               PREFIX="${BASH_REMATCH[0]}"
               MESSAGE="${line#$PREFIX}"
               
@@ -123,7 +127,7 @@ jobs:
               # Fallback for non-conventional commits
               MINECRAFT_CHANGELOG+="- 🌟 **Magic Happened!** $line\n"
             fi
-          done <<< "$CHANGELOG"
+          done < /tmp/changelog.txt
           
           # If no changes found, add a default message
           if [ -z "$MINECRAFT_CHANGELOG" ]; then
